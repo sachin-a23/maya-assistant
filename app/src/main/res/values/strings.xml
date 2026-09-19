@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Maya Assistant</string>
+    <string name="accessibility_service_description">Maya uses this to see what\'s on your screen and perform actions you ask for, like opening apps or tapping buttons. Only active while you keep this switched on.</string>
+</resources>
