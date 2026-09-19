@@ -4,7 +4,9 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -21,11 +23,9 @@
         </activity>
 
         <!--
-            Accessibility Service: this is what lets Maya read the screen
-            and perform actions (clicks, typing, app switching) on YOUR OWN
-            device, once YOU turn it on manually in Android Settings.
-            It cannot be enabled silently — Android always requires the
-            user to flip this on by hand in Settings > Accessibility.
+            Accessibility Service: reads the screen and performs actions
+            (clicks, typing, app switching) on YOUR OWN device, once YOU
+            turn it on manually in Android Settings.
         -->
         <service
             android:name=".MayaAccessibilityService"
@@ -38,6 +38,26 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+
+        <!--
+            Notification Listener: reads notification content so Maya
+            can speak them out loud. Also requires manual user
+            enablement in Settings > Notification access.
+        -->
+        <service
+            android:name=".MayaNotificationListenerService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Keeps Maya alive in the background (TTS + call watching). -->
+        <service
+            android:name=".MayaForegroundService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
 
     </application>
 </manifest>

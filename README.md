@@ -41,3 +41,30 @@ hai taaki koi app chupke se poora control na le sake.
   karo"), use `MayaAccessibilityService.instance` ke through call
   karo — `openApp()`, `clickNodeByText()`, `typeIntoFocusedField()`
   already bane hue hain.
+
+## Naya kya hai (Phase 2)
+
+- **Notification/call sunna**: App khulne ke baad "Enable Notification
+  Access" dabao (Settings mein khud ON karna padega). Naya notification
+  aane par ya call aane par Maya bolke batayegi.
+- **AI se command samajhna**: App mein apna Claude API key paste karke
+  "Save API Key" dabao (console.anthropic.com se milega). Ab "Start
+  Listening" se jo bhi bologe, Claude use samjhega aur action lega
+  (app kholna, screen pe tap karna, text type karna, ya sirf jawab
+  bolna).
+- **Background mein chalna**: App khulte hi ek foreground service
+  start ho jata hai (status bar mein "Maya is running" dikhega) —
+  isse call/notification tab bhi track hote rahen jab app band ho.
+
+### Zaroori: API key kabhi kisi ko mat bhejo
+Ye key seedha tumhare phone ke local storage mein save hoti hai,
+kahin upload nahi hoti. Isse bill tumhare Anthropic account pe aata
+hai, isliye safe rakhna.
+
+## Aage kya (Phase 3 — bahar se remote control)
+
+Iske liye ek cloud relay chahiye (jaise Firebase Realtime Database):
+phone ek "commands" folder sunega, aur tum kahin se bhi (web browser
+se) us folder mein command likh doge. Iske liye pehle
+firebase.google.com par free account/project banana padega — jab
+ready ho, bata dena, uska integration code bana dunga.

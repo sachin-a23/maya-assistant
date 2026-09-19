@@ -1,30 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Maya Assistant"
-        android:textSize="22sp"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
 
-    <Button
-        android:id="@+id/enableAccessibilityBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enable Accessibility Permission" />
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Maya Assistant"
+            android:textSize="18sp"
+            android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/startListeningBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Start Listening" />
+        <Button
+            android:id="@+id/enableAccessibilityBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Accessibility Permission" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/enableNotificationsBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Enable Notification Access" />
+
+        <EditText
+            android:id="@+id/apiKeyInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Paste your Claude API key"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/saveApiKeyBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Save API Key" />
+
+        <Button
+            android:id="@+id/startListeningBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Start Listening" />
+
+    </LinearLayout>
+</ScrollView>

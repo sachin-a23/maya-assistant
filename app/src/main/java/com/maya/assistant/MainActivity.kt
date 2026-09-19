@@ -1,17 +1,23 @@
 package com.maya.assistant
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
     private val speechRequestCode = 101
+    private val permissionRequestCode = 202
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,22 +26,53 @@ class MainActivity : AppCompatActivity() {
         val statusText = findViewById<TextView>(R.id.statusText)
         val enableAccessibilityBtn = findViewById<Button>(R.id.enableAccessibilityBtn)
         val startListeningBtn = findViewById<Button>(R.id.startListeningBtn)
+        val enableNotificationsBtn = findViewById<Button>(R.id.enableNotificationsBtn)
+        val apiKeyInput = findViewById<EditText>(R.id.apiKeyInput)
+        val saveApiKeyBtn = findViewById<Button>(R.id.saveApiKeyBtn)
 
-        // This just opens Android's own Accessibility settings screen.
-        // YOU have to manually flip the switch there — apps are not
-        // allowed to enable this permission for themselves.
+        // Start the background service so TTS + call watching are ready.
+        ContextCompat.startForegroundService(this, Intent(this, MayaForegroundService::class.java))
+
+        requestRuntimePermissions()
+
         enableAccessibilityBtn.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+
+        enableNotificationsBtn.setOnClickListener {
+            startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+        }
+
+        saveApiKeyBtn.setOnClickListener {
+            val key = apiKeyInput.text.toString().trim()
+            if (key.isNotEmpty()) {
+                ClaudeCommandProcessor.saveApiKey(this, key)
+                Toast.makeText(this, "API key saved", Toast.LENGTH_SHORT).show()
+            }
         }
 
         startListeningBtn.setOnClickListener {
             launchSpeechRecognizer()
         }
 
-        statusText.text = if (MayaAccessibilityService.isRunning) {
-            "Maya accessibility service: ON"
-        } else {
-            "Maya accessibility service: OFF (tap button below)"
+        statusText.text = buildString {
+            append(if (MayaAccessibilityService.isRunning) "Accessibility: ON\n" else "Accessibility: OFF\n")
+            append(if (ClaudeCommandProcessor.hasApiKey(this@MainActivity)) "Claude API key: saved" else "Claude API key: not set")
+        }
+    }
+
+    private fun requestRuntimePermissions() {
+        val needed = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED) needed.add(Manifest.permission.RECORD_AUDIO)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+            != PackageManager.PERMISSION_GRANTED) needed.add(Manifest.permission.READ_PHONE_STATE)
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED) needed.add(Manifest.permission.POST_NOTIFICATIONS)
+
+        if (needed.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, needed.toTypedArray(), permissionRequestCode)
         }
     }
 
@@ -59,10 +96,9 @@ class MainActivity : AppCompatActivity() {
             val spokenText = results?.get(0) ?: return
             Toast.makeText(this, "Heard: $spokenText", Toast.LENGTH_SHORT).show()
 
-            // TODO: send `spokenText` to your AI backend (e.g. Claude API)
-            // to decide what action to take, then call into
-            // MayaAccessibilityService to perform it (open an app,
-            // tap a button, type text, etc.)
+            ClaudeCommandProcessor.handleCommand(this, spokenText) { status ->
+                Toast.makeText(this, status, Toast.LENGTH_LONG).show()
+            }
         }
     }
 }
